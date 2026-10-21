@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 214 33% 97%;
+    --foreground: 217 45% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 217 45% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 217 45% 12%;
+    --primary: 226 82% 52%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 214 32% 93%;
+    --secondary-foreground: 217 45% 16%;
+    --muted: 214 28% 94%;
+    --muted-foreground: 217 15% 40%;
+    --accent: 226 90% 95%;
+    --accent-foreground: 226 70% 32%;
+    --destructive: 4 70% 46%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 24% 87%;
+    --input: 214 24% 84%;
+    --ring: 226 82% 52%;
+    --radius: 0.7rem;
+    --verified: 157 72% 30%;
+    --verified-soft: 154 60% 93%;
+    --pending: 36 88% 36%;
+    --pending-soft: 42 95% 91%;
+    --gap: 4 70% 46%;
+    --gap-soft: 5 85% 95%;
+    --ink: 217 50% 10%;
+  }
+  .dark {
+    --background: 220 38% 7%;
+    --foreground: 214 30% 94%;
+    --card: 220 32% 10%;
+    --card-foreground: 214 30% 94%;
+    --popover: 220 32% 10%;
+    --popover-foreground: 214 30% 94%;
+    --primary: 224 100% 70%;
+    --primary-foreground: 220 38% 8%;
+    --secondary: 220 26% 16%;
+    --secondary-foreground: 214 30% 92%;
+    --muted: 220 26% 14%;
+    --muted-foreground: 215 16% 66%;
+    --accent: 224 40% 20%;
+    --accent-foreground: 224 100% 85%;
+    --destructive: 4 80% 62%;
+    --destructive-foreground: 220 38% 8%;
+    --border: 220 22% 20%;
+    --input: 220 22% 24%;
+    --ring: 224 100% 70%;
+    --verified: 152 62% 52%;
+    --verified-soft: 154 40% 15%;
+    --pending: 40 92% 60%;
+    --pending-soft: 38 50% 16%;
+    --gap: 5 85% 66%;
+    --gap-soft: 5 45% 17%;
+    --ink: 214 30% 96%;
+  }
+  * { @apply border-border; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { @apply bg-background text-foreground antialiased; font-feature-settings: 'ss01', 'cv11'; }
+  h1, h2, h3 { letter-spacing: -0.02em; }
+  :focus-visible { @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background; }
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
+
+/* Hatched fill = self-reported but not verified. The signature mark of the product. */
+@layer utilities {
+  .hatch {
+    background-image: repeating-linear-gradient(135deg, hsl(var(--pending) / 0.55) 0 3px, transparent 3px 7px);
+  }
+  .tabular { font-variant-numeric: tabular-nums; }
+}
