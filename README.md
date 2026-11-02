@@ -1,5 +1,6 @@
 # Placement Skill Matcher & Readiness Analyser
-
+Frontend URL:- https://placement-portal-theta-gray.vercel.app
+Backend URL:- https://placement-portal-qqtn.onrender.com
 An evidence-based placement readiness and skill-gap platform for a college placement cell. Students see exactly how ready they are for each drive and why; faculty verify the evidence behind every claim; the placement cell sees supply versus demand across the cohort; recruiters see only what they have been explicitly granted.
 
 The design rule that shapes everything: **eligibility, readiness and AI are three separate things.**
