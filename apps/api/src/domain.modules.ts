@@ -9,6 +9,9 @@ import { PlansModule } from './plans/plans.module';
 import { RecruiterModule } from './recruiter/recruiter.module';
 import { ReportsModule } from './reports/reports.module';
 import { AiModule } from './ai/ai.module';
+import { RolesModule } from './roles/roles.module';
+import { FilesModule } from './files/files.module';
+import { InterviewsModule } from './interviews/interviews.module';
 
 /**
  * Feature modules are registered here as they are built, so AppModule stays small.
@@ -25,4 +28,7 @@ export const DomainModules: any[] = [
   RecruiterModule,
   ReportsModule,
   AiModule,
+  RolesModule,
+  FilesModule,
+  InterviewsModule,
 ];

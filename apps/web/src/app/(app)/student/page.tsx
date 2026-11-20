@@ -9,6 +9,7 @@ import { EligibilityBadge, EvidenceStateBadge, RegistrationBadge } from '@/compo
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { EmptyState } from '@/components/states';
+import type { RoleMatch } from '@/components/student/types';
 import { useApi } from '@/lib/hooks';
 import { useAuth } from '@/lib/auth';
 import { daysUntil, fmtDate } from '@/lib/utils';
@@ -22,6 +23,34 @@ interface Dash {
   topGaps: { label: string; gap: number; impact: number; drive: string; evidenceState: string }[];
   upcomingDeadlines: { _id: string; company: string; role: string; deadline: string }[];
   plans: { drive: string; startDate: string; endDate: string; progress: { total: number; done: number; percent: number } }[];
+}
+
+function TargetRoleCard() {
+  const q = useApi<{ roleId: string | null; match: RoleMatch | null }>('/roles/target');
+  if (!q.data) return null;
+  const m = q.data.match;
+  return (
+    <Card>
+      <CardContent className="flex flex-wrap items-center gap-5 p-5">
+        {m ? (
+          <>
+            <ScoreRing score={m.score} label="Role match" capped={m.cappedByMandatory} />
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="text-xs text-muted-foreground">Your target role</p>
+              <p className="font-semibold">{m.role.title} <span className="text-sm font-normal text-muted-foreground">· {m.bandLabel}</span></p>
+              <p className="text-sm text-muted-foreground">{m.guidance.length ? `Top gaps: ${m.guidance.slice(0, 3).map((g) => g.label).join(', ')}` : 'You meet every expectation for this role.'}</p>
+            </div>
+            <div className="flex gap-2">
+              <Link className="text-sm font-medium text-primary underline-offset-4 hover:underline" href={`/student/roles/${m.role.id}`}>Skill gap</Link>
+              <Link className="text-sm font-medium text-primary underline-offset-4 hover:underline" href={`/student/interview?role=${m.role.id}`}>Practise interview</Link>
+            </div>
+          </>
+        ) : (
+          <p className="text-sm">You have not chosen a target role yet. <Link className="font-medium text-primary underline-offset-4 hover:underline" href="/student/roles">Explore roles</Link></p>
+        )}
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function StudentDashboard() {
@@ -39,6 +68,8 @@ export default function StudentDashboard() {
               <StatCard label="Evidence awaiting review" value={d.pendingEvidence} icon={<FileCheck2 />} hint="With your faculty mentor" />
               <StatCard label="Profile complete" value={`${d.completion.percent}%`} hint={d.completion.percent < 100 ? 'Eligibility needs a complete profile' : 'All set'} />
             </div>
+
+            <TargetRoleCard />
 
             {d.completion.percent < 100 && (
               <Card className="border-pending/40 bg-pending-soft/50">

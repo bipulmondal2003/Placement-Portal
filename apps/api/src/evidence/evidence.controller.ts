@@ -34,6 +34,7 @@ class SubmitEvidenceDto {
   @IsString() @MinLength(3) @MaxLength(200) title: string;
   @IsOptional() @IsString() @MaxLength(4000) description?: string;
   @IsOptional() @IsUrl({ require_protocol: true, protocols: ['http', 'https'] }) @MaxLength(500) url?: string;
+  @IsOptional() @IsMongoId() fileId?: string;
   @IsArray() @ArrayMinSize(1) @ArrayMaxSize(15) @ValidateNested({ each: true }) @Type(() => ClaimDto) skills: ClaimDto[];
   @IsOptional() @IsObject() meta?: Record<string, any>;
 }

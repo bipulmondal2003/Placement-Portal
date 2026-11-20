@@ -11,10 +11,18 @@ export class SystemConfigService {
 
   /** Returns the singleton config, creating it with defaults on first use. */
   async get(): Promise<SystemConfig> {
-    const doc = await this.model
-      .findOneAndUpdate({ key: 'main' }, { $setOnInsert: { key: 'main' } }, { upsert: true, new: true, setDefaultsOnInsert: true })
-      .lean();
-    return doc as unknown as SystemConfig;
+    // Two requests that hit an empty database at the same moment can both try to create the singleton;
+    // MongoDB reports the loser as a duplicate-key error (11000). Retrying reads the winner's document.
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const doc = await this.model
+          .findOneAndUpdate({ key: 'main' }, { $setOnInsert: { key: 'main' } }, { upsert: true, new: true, setDefaultsOnInsert: true })
+          .lean();
+        return doc as unknown as SystemConfig;
+      } catch (err) {
+        if ((err as { code?: number })?.code !== 11000 || attempt >= 2) throw err;
+      }
+    }
   }
 
   async update(patch: Partial<SystemConfig>): Promise<SystemConfig> {

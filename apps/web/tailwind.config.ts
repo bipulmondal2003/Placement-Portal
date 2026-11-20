@@ -26,6 +26,7 @@ const config: Config = {
         pending: { DEFAULT: 'hsl(var(--pending))', soft: 'hsl(var(--pending-soft))' },
         gap: { DEFAULT: 'hsl(var(--gap))', soft: 'hsl(var(--gap-soft))' },
         ink: 'hsl(var(--ink))',
+        brand: 'hsl(var(--brand))',
       },
       borderRadius: { lg: 'var(--radius)', md: 'calc(var(--radius) - 3px)', sm: 'calc(var(--radius) - 6px)' },
     },

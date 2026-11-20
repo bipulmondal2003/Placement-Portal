@@ -150,6 +150,7 @@ export interface Evidence {
   url?: string;
   skills: EvidenceSkill[];
   source: string;
+  file?: { id: string; name: string; mimeType: string; size: number } | null;
   status: 'pending' | 'verified' | 'rejected';
   createdAt: string;
   updatedAt: string;
@@ -162,3 +163,28 @@ export interface Evidence {
     createdAt: string;
   }>;
 }
+
+export interface RoleMatchRow {
+  roleId: string; title: string; family: string; score: number; band: string; bandLabel: string;
+  requirementCount: number; matchedCount: number; improveCount: number; missingCount: number; topGap: string | null; isTarget: boolean;
+}
+export interface RoleItem { label: string; requiredLevel: number; verifiedLevel: number; selfReportedLevel?: number; mandatory: boolean; weight: number; evidenceState?: string }
+export interface RoleMatch {
+  role: { id: string; slug: string; title: string; family: string; summary?: string };
+  isTarget: boolean; score: number; band: string; bandLabel: string; cappedByMandatory: boolean;
+  dimensions: Dimensions;
+  matched: RoleItem[]; improve: RoleItem[]; missing: RoleItem[];
+  guidance: Array<{ label: string; skillId?: string; requiredLevel: number; verifiedLevel: number; mandatory: boolean; evidenceState: string; impact: number; action: string }>;
+  nextActions: string[]; explanation: string[];
+}
+export interface InterviewTurnView {
+  role: 'interviewer' | 'candidate'; text: string; skill?: string; at: string;
+  feedback?: { score: number; strengths: string[]; improvements: string[]; hint?: string };
+}
+export interface InterviewView {
+  id: string; role: { id: string; title: string }; mode: 'ai' | 'practice'; difficulty: string; status: 'active' | 'completed';
+  plannedQuestions: number; answered: number; turns: InterviewTurnView[]; notice: string;
+  summary?: { averageScore: number; overall: string; strengths: string[]; improvements: string[]; practiceTopics: string[]; bySkill: Array<{ skill: string; score: number }> };
+  createdAt: string; completedAt?: string;
+}
+export interface InterviewListItem { id: string; roleTitle: string; mode: string; status: string; answered: number; plannedQuestions: number; averageScore: number | null; createdAt: string }

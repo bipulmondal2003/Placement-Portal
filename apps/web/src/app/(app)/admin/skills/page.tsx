@@ -102,7 +102,7 @@ export default function AdminSkills() {
             <div><label htmlFor="ts-c" className="mb-1 block text-xs text-muted-foreground">Category</label><Select id="ts-c" className="w-56" value={category} onChange={(e) => setCategory(e.target.value)}><option value="">All</option>{meta.data?.categories.map((c) => <option key={c}>{c}</option>)}</Select></div>
           </div>
           <Query q={list} rows={5}>{(rows) => (
-            <ul className="divide-y rounded-lg border bg-card">{rows.map((s) => (
+            <ul className="divide-y glass rounded-xl">{rows.map((s) => (
               <li key={s.id}><button type="button" onClick={() => setEdit(s)} className="flex w-full flex-wrap items-center justify-between gap-2 p-3 text-left text-sm hover:bg-muted/50"><span><span className="font-medium">{s.name}</span>{s.synonyms.length > 0 && <span className="ml-2 text-xs text-muted-foreground">{s.synonyms.join(', ')}</span>}</span><span className="flex gap-1.5"><Badge>{s.category}</Badge><Badge variant="outline">{s.dimension}</Badge></span></button></li>
             ))}{rows.length === 0 && <li className="p-4 text-sm text-muted-foreground">No skills match.</li>}</ul>
           )}</Query>

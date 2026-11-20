@@ -11,6 +11,7 @@ import { JobsService } from '../queues/jobs.service';
 import { AuditService } from '../audit/audit.service';
 import { CacheService } from '../redis/cache.service';
 import { Page, paginate } from '../common/pagination';
+import { FilesService } from '../files/files.service';
 
 /** Evidence types a student may create by hand. Assessment / mock-interview evidence is created by the system only. */
 export const STUDENT_SUBMITTABLE: EvidenceType[] = [EvidenceType.Academic, EvidenceType.Project, EvidenceType.Certification, EvidenceType.External];
@@ -20,6 +21,8 @@ export interface SubmitEvidenceInput {
   title: string;
   description?: string;
   url?: string;
+  /** Id of a certificate previously uploaded through POST /files/certificates (certification evidence only). */
+  fileId?: string;
   skills: Array<{ skill: string; claimedLevel: number }>;
   meta?: Record<string, any>;
   source?: EvidenceSource;
@@ -43,6 +46,7 @@ export class EvidenceService {
     private readonly jobs: JobsService,
     private readonly audit: AuditService,
     private readonly cache: CacheService,
+    private readonly files: FilesService,
   ) {}
 
   async submit(student: AuthUser, input: SubmitEvidenceInput, ip?: string) {
@@ -55,6 +59,12 @@ export class EvidenceService {
     if (new Set(ids).size !== ids.length) throw new BadRequestException('Each skill may be claimed only once per evidence item');
     await this.skills.assertSkillsExist(ids);
 
+    if (input.fileId && input.type !== EvidenceType.Certification) {
+      throw new BadRequestException('Files can only be attached to certification evidence');
+    }
+    // The upload must be this student's own, unused certificate. Claimed again atomically below.
+    const file = input.fileId ? await this.files.assertAttachable(student.id, input.fileId) : undefined;
+
     // Resume-extracted claims carry source=resume_ai and always start unverified, like everything else.
     const doc = await this.evidence.create({
       student: student.id,
@@ -62,11 +72,16 @@ export class EvidenceService {
       title: input.title,
       description: input.description,
       url: input.url,
+      file,
       meta: input.meta,
       source: input.source === EvidenceSource.ResumeAi ? EvidenceSource.ResumeAi : EvidenceSource.Manual,
       status: EvidenceStatus.Pending,
       skills: input.skills.map((s) => ({ skill: s.skill, claimedLevel: s.claimedLevel })),
     });
+    if (file && !(await this.files.attach(student.id, file.id, String(doc._id)))) {
+      await this.evidence.deleteOne({ _id: doc._id });
+      throw new ConflictException('This file was just attached to another evidence item');
+    }
     await this.audit.log('evidence.submit', student, 'EvidenceItem', String(doc._id), { type: input.type }, ip);
     // The pending claim changes the student's profile (pending counters) but never their verified level.
     await this.jobs.requestRecalculation(student.id, ids, 'evidence_submitted');
@@ -235,6 +250,7 @@ export class EvidenceService {
     if (!ev) throw new NotFoundException('Evidence not found');
     if (ev.status !== EvidenceStatus.Pending) throw new ConflictException('Only pending evidence can be withdrawn');
     await ev.deleteOne();
+    await this.files.deleteForEvidence(id);
     await this.afterChange(student.id, ev.skills.map((s) => String(s.skill)));
     return { ok: true };
   }

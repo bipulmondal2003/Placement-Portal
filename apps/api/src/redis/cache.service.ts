@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
 export const REDIS_CLIENT = 'REDIS_CLIENT';
@@ -47,6 +48,34 @@ export class CacheService {
       this.logger.warn(`cache write failed (${ns}): ${(err as Error).message}`);
     }
     return value;
+  }
+
+  /**
+   * Short-lived mutual exclusion (SET NX PX). Used to stop one action from running twice at once, for example a
+   * double-clicked "Send" that would otherwise trigger two paid AI calls. Fails OPEN when Redis is down so a Redis
+   * outage never blocks users; the database-level guards still apply.
+   */
+  async lock(name: string, ttlMs: number): Promise<{ acquired: boolean; release: () => Promise<void> }> {
+    const key = `prp:lock:${name}`;
+    const token = randomUUID();
+    const r = this.redis as unknown as { set(k: string, v: string, px: 'PX', ttl: number, nx: 'NX'): Promise<'OK' | null> };
+    try {
+      const ok = await r.set(key, token, 'PX', ttlMs, 'NX');
+      if (ok !== 'OK') return { acquired: false, release: async () => undefined };
+    } catch (err) {
+      this.logger.warn(`lock unavailable (${name}): ${(err as Error).message}`);
+      return { acquired: true, release: async () => undefined };
+    }
+    return {
+      acquired: true,
+      release: async () => {
+        try {
+          if ((await this.redis.get(key)) === token) await this.redis.del(key);
+        } catch {
+          /* the TTL frees it */
+        }
+      },
+    };
   }
 
   /** Invalidate every key in a namespace. */

@@ -85,6 +85,7 @@ export default function StudentEvidence() {
               <div className="space-y-3 text-sm">
                 <div className="flex items-center justify-between gap-2"><p className="font-semibold">{e.title}</p><EvidenceStatusBadge status={e.status} /></div>
                 {e.description && <p className="whitespace-pre-line text-muted-foreground">{e.description}</p>}
+                {e.file && <p><a className="text-primary underline-offset-4 hover:underline" href={`/api/files/${e.file.id}`} target="_blank" rel="noopener noreferrer">Certificate file: {e.file.name}</a> <span className="text-xs text-muted-foreground">({Math.max(1, Math.round(e.file.size / 1024))} KB)</span></p>}
                 {e.url && <p><a className="text-primary underline-offset-4 hover:underline" href={e.url} target="_blank" rel="noopener noreferrer">{e.url}</a></p>}
                 <div>
                   <p className="mb-1 font-medium">Review history</p>

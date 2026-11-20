@@ -38,6 +38,9 @@ import {
   AuditLog,
   AuditLogSchema,
 } from './schemas/recruiter.schema';
+import { InterviewSession, InterviewSessionSchema } from './schemas/interview.schema';
+import { StoredFile, StoredFileSchema } from './schemas/file.schema';
+import { RoleProfile, RoleProfileSchema } from './schemas/role.schema';
 import { BatchJob, BatchJobSchema, SystemConfig, SystemConfigSchema } from './schemas/system.schema';
 
 const models = MongooseModule.forFeature([
@@ -65,6 +68,9 @@ const models = MongooseModule.forFeature([
   { name: AuditLog.name, schema: AuditLogSchema },
   { name: BatchJob.name, schema: BatchJobSchema },
   { name: SystemConfig.name, schema: SystemConfigSchema },
+  { name: RoleProfile.name, schema: RoleProfileSchema },
+  { name: StoredFile.name, schema: StoredFileSchema },
+  { name: InterviewSession.name, schema: InterviewSessionSchema },
 ]);
 
 /** Registers every model once, globally, so feature modules just `@InjectModel(X.name)`. */

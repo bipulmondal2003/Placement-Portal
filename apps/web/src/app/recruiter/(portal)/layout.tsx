@@ -18,7 +18,7 @@ export default function RecruiterPortalLayout({ children }: { children: React.Re
   if (loading || !user || user.role !== 'recruiter') return <div className="mx-auto max-w-3xl p-8"><LoadingBlock /></div>;
   return (
     <div className="min-h-screen">
-      <header className="border-b bg-card">
+      <header className="glass-strong sticky top-0 z-30">
         <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <Brand href="/recruiter" />
           <div className="flex items-center gap-2">

@@ -29,7 +29,7 @@ export function SkillPicker({ onPick, exclude = [], label = 'Search skills', id 
         {isLoading ? 'Searching…' : error ? 'Could not search skills. Try again.' : rows.length === 0 ? 'No matching skills.' : `${rows.length} suggestion${rows.length === 1 ? '' : 's'}${debounced ? '' : ' (popular first). Type to narrow down'}`}
       </div>
       {rows.length > 0 && (
-        <ul className="max-h-56 divide-y overflow-y-auto rounded-md border bg-card">
+        <ul className="max-h-56 divide-y overflow-y-auto glass rounded-md">
           {rows.map((s) => (
             <li key={s.id}>
               <button type="button" onClick={() => onPick(s)} className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm hover:bg-accent">

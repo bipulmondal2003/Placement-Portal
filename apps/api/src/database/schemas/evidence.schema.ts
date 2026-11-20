@@ -34,6 +34,10 @@ export class EvidenceItem {
   @Prop({ trim: true, maxlength: 500 })
   url?: string;
 
+  /** Uploaded document (certificate scan) attached to this evidence, if any. Contents live in StoredFile. */
+  @Prop({ type: Object })
+  file?: { id: string; name: string; mimeType: string; size: number };
+
   @Prop({ type: [SkillClaimSchema], default: [] })
   skills: SkillClaim[];
 

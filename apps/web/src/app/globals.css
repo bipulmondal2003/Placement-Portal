@@ -4,25 +4,25 @@
 
 @layer base {
   :root {
-    --background: 214 33% 97%;
+    --background: 222 45% 96%;
     --foreground: 217 45% 12%;
     --card: 0 0% 100%;
     --card-foreground: 217 45% 12%;
     --popover: 0 0% 100%;
     --popover-foreground: 217 45% 12%;
-    --primary: 226 82% 52%;
+    --primary: 224 64% 26%;
     --primary-foreground: 0 0% 100%;
     --secondary: 214 32% 93%;
     --secondary-foreground: 217 45% 16%;
     --muted: 214 28% 94%;
     --muted-foreground: 217 15% 40%;
-    --accent: 226 90% 95%;
-    --accent-foreground: 226 70% 32%;
+    --accent: 24 100% 93%;
+    --accent-foreground: 18 80% 28%;
     --destructive: 4 70% 46%;
     --destructive-foreground: 0 0% 100%;
     --border: 214 24% 87%;
     --input: 214 24% 84%;
-    --ring: 226 82% 52%;
+    --ring: 24 92% 48%;
     --radius: 0.7rem;
     --verified: 157 72% 30%;
     --verified-soft: 154 60% 93%;
@@ -31,27 +31,33 @@
     --gap: 4 70% 46%;
     --gap-soft: 5 85% 95%;
     --ink: 217 50% 10%;
+    --brand: 24 92% 52%;
+    --brand-navy: 224 64% 26%;
+    --glass: 0 0% 100% / 0.62;
+    --glass-strong: 0 0% 100% / 0.82;
+    --glass-border: 0 0% 100% / 0.7;
+    --glass-shadow: 224 60% 20% / 0.12;
   }
   .dark {
-    --background: 220 38% 7%;
+    --background: 224 50% 7%;
     --foreground: 214 30% 94%;
     --card: 220 32% 10%;
     --card-foreground: 214 30% 94%;
     --popover: 220 32% 10%;
     --popover-foreground: 214 30% 94%;
-    --primary: 224 100% 70%;
+    --primary: 24 96% 58%;
     --primary-foreground: 220 38% 8%;
     --secondary: 220 26% 16%;
     --secondary-foreground: 214 30% 92%;
     --muted: 220 26% 14%;
     --muted-foreground: 215 16% 66%;
-    --accent: 224 40% 20%;
-    --accent-foreground: 224 100% 85%;
+    --accent: 24 45% 20%;
+    --accent-foreground: 26 100% 84%;
     --destructive: 4 80% 62%;
     --destructive-foreground: 220 38% 8%;
     --border: 220 22% 20%;
     --input: 220 22% 24%;
-    --ring: 224 100% 70%;
+    --ring: 24 96% 58%;
     --verified: 152 62% 52%;
     --verified-soft: 154 40% 15%;
     --pending: 40 92% 60%;
@@ -59,10 +65,24 @@
     --gap: 5 85% 66%;
     --gap-soft: 5 45% 17%;
     --ink: 214 30% 96%;
+    --brand: 24 96% 58%;
+    --brand-navy: 224 70% 60%;
+    --glass: 224 40% 14% / 0.55;
+    --glass-strong: 224 40% 11% / 0.8;
+    --glass-border: 0 0% 100% / 0.12;
+    --glass-shadow: 0 0% 0% / 0.4;
   }
   * { @apply border-border; }
   html { -webkit-text-size-adjust: 100%; }
-  body { @apply bg-background text-foreground antialiased; font-feature-settings: 'ss01', 'cv11'; }
+  body { @apply bg-background text-foreground antialiased; font-feature-settings: 'ss01', 'cv11'; position: relative; }
+  /* Soft brand-coloured orbs behind the glass panels (decorative, fixed, never captures clicks). */
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(40rem 32rem at 8% -6%, hsl(var(--brand) / 0.28), transparent 60%),
+      radial-gradient(44rem 36rem at 100% 8%, hsl(var(--brand-navy) / 0.22), transparent 60%),
+      radial-gradient(36rem 30rem at 50% 108%, hsl(var(--brand) / 0.16), transparent 60%);
+  }
   h1, h2, h3 { letter-spacing: -0.02em; }
   :focus-visible { @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background; }
   @media (prefers-reduced-motion: reduce) {
@@ -72,6 +92,29 @@
 
 /* Hatched fill = self-reported but not verified. The signature mark of the product. */
 @layer utilities {
+  /* Glassmorphism: translucent fill, blur, light border, soft shadow. Falls back to a solid card where blur is unsupported. */
+  .glass {
+    background-color: hsl(var(--glass));
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: 0 8px 28px -10px hsl(var(--glass-shadow)), inset 0 1px 0 hsl(0 0% 100% / 0.35);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    backdrop-filter: blur(16px) saturate(160%);
+  }
+  .glass-strong {
+    background-color: hsl(var(--glass-strong));
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: 0 16px 48px -12px hsl(var(--glass-shadow));
+    -webkit-backdrop-filter: blur(24px) saturate(170%);
+    backdrop-filter: blur(24px) saturate(170%);
+  }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass, .glass-strong { background-color: hsl(var(--card)); }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .glass, .glass-strong { background-color: hsl(var(--card)); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  }
+  .brand-gradient { background-image: linear-gradient(135deg, hsl(var(--brand)), hsl(24 100% 62%) 45%, hsl(var(--brand-navy))); }
+  .brand-text { background-image: linear-gradient(90deg, hsl(var(--brand)), hsl(var(--brand-navy))); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .hatch {
     background-image: repeating-linear-gradient(135deg, hsl(var(--pending) / 0.55) 0 3px, transparent 3px 7px);
   }

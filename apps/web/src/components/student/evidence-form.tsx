@@ -22,6 +22,7 @@ export function EvidenceForm({ onDone, initialSkill }: { onDone: () => void; ini
   const [description, setDescription] = useState('');
   const [url, setUrl] = useState('');
   const [skills, setSkills] = useState<{ id: string; name: string; level: number }[]>(initialSkill ? [{ ...initialSkill, level: 3 }] : []);
+  const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,9 +31,13 @@ export function EvidenceForm({ onDone, initialSkill }: { onDone: () => void; ini
     setError(null);
     if (title.trim().length < 3) return setError('Give the evidence a title of at least 3 characters.');
     if (skills.length === 0) return setError('Link at least one skill.');
+    if (file && type !== 'certification') return setError('Files can only be attached to certifications.');
     setBusy(true);
     try {
+      let fileId: string | undefined;
+      if (file && type === 'certification') fileId = (await api.upload<{ id: string }>('/files/certificates', 'file', file)).id;
       await api.post('/evidence', {
+        fileId,
         type,
         title: title.trim(),
         description: description.trim() || undefined,
@@ -52,7 +57,18 @@ export function EvidenceForm({ onDone, initialSkill }: { onDone: () => void; ini
       <Field label="Type" htmlFor="ev-type"><Select id="ev-type" value={type} onChange={(e) => setType(e.target.value)}>{TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</Select></Field>
       <Field label="Title" htmlFor="ev-title"><Input id="ev-title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={200} placeholder="e.g. Placement tracker, MERN stack" /></Field>
       <Field label="What did you do?" htmlFor="ev-desc" hint="Reviewers read this. Be specific about your own contribution."><Textarea id="ev-desc" value={description} onChange={(e) => setDescription(e.target.value)} maxLength={4000} /></Field>
-      <Field label="Link (optional)" htmlFor="ev-url" hint="Repository, certificate or demo URL starting with https://. Files cannot be uploaded in this version."><Input id="ev-url" type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://github.com/…" /></Field>
+      <Field label="Link (optional)" htmlFor="ev-url" hint="Repository, certificate or demo URL starting with https://."><Input id="ev-url" type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://github.com/…" /></Field>
+
+      {type === 'certification' && (
+        <Field label="Certificate file (optional)" htmlFor="ev-file" hint="PDF, PNG or JPEG, up to 2 MB. Reviewers can open it. Uploading a file does not verify anything.">
+          <Input id="ev-file" type="file" accept="application/pdf,image/png,image/jpeg" onChange={(e) => {
+            const f = e.target.files?.[0] ?? null;
+            if (f && f.size > 2 * 1024 * 1024) { setError('That file is larger than 2 MB.'); e.target.value = ''; setFile(null); return; }
+            if (f && !['application/pdf', 'image/png', 'image/jpeg'].includes(f.type)) { setError('Only PDF, PNG or JPEG files are accepted.'); e.target.value = ''; setFile(null); return; }
+            setError(null); setFile(f);
+          }} />
+        </Field>
+      )}
 
       <div className="space-y-2">
         <p className="text-sm font-medium">Skills this shows</p>

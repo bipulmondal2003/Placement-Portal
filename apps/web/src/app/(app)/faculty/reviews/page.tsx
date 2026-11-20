@@ -34,6 +34,7 @@ function ReviewDialog({ item, onClose, onDone }: { item: QItem; onClose: () => v
     <div className="space-y-4 text-sm">
       <div><p className="font-semibold">{item.title}</p><p className="text-xs text-muted-foreground">{titleCase(item.type)} · {item.student?.name} · {item.student?.department} · submitted {fmtDate(item.createdAt)}</p></div>
       {item.description && <p className="whitespace-pre-line text-muted-foreground">{item.description}</p>}
+      {item.file && <p><a className="text-primary underline-offset-4 hover:underline" href={`/api/files/${item.file.id}`} target="_blank" rel="noopener noreferrer">Open certificate file: {item.file.name}</a> <span className="text-xs text-muted-foreground">(uploaded by the student; check it is genuine before awarding)</span></p>}
       {item.url ? <p><a className="text-primary underline-offset-4 hover:underline" href={item.url} target="_blank" rel="noopener noreferrer">Open the submitted link</a></p> : <p className="text-xs text-muted-foreground">No link was provided.</p>}
       <div>
         <p className="mb-2 font-medium">Level to award for each skill</p>

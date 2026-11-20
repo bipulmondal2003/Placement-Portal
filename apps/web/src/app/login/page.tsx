@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { Brand } from '@/components/app-shell';
+import { LogoMark } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Field } from '@/components/ui/label';
@@ -69,11 +70,25 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="grid min-h-screen place-items-center p-4">
-      <div className="w-full max-w-md space-y-6">
-        <Brand />
-        <Suspense><LoginForm /></Suspense>
-      </div>
+    <div className="grid min-h-screen lg:grid-cols-[1.1fr_1fr]">
+      <aside className="brand-gradient relative hidden flex-col justify-between p-10 text-white lg:flex">
+        <div className="flex items-center gap-3 text-lg font-semibold"><LogoMark className="size-11" />Placement Skill Matcher</div>
+        <div>
+          <h2 className="max-w-md text-4xl font-bold leading-tight">Prove your skills. Close your gaps. Get placed.</h2>
+          <ul className="mt-6 space-y-2 text-white/90">
+            <li>• Match your verified skills to 7 target roles</li>
+            <li>• Upload certificates for faculty review</li>
+            <li>• Practise chat-style mock interviews</li>
+          </ul>
+        </div>
+        <p className="text-xs text-white/80">Independent student project, not an official university portal.</p>
+      </aside>
+      <main className="grid place-items-center p-4">
+        <div className="w-full max-w-md space-y-6">
+          <div className="lg:hidden"><Brand /></div>
+          <Suspense><LoginForm /></Suspense>
+        </div>
+      </main>
     </div>
   );
 }

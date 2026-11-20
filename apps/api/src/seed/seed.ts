@@ -1,4 +1,3 @@
-import * as path from 'node:path';
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -31,6 +30,7 @@ import { buildRuleBasedPlan } from '../plans/planner';
 import { slugify } from '../skills/skills.service';
 import { CLUSTERS, SKILLS, SD, DATA, QA } from './taxonomy.data';
 import { ASSESSMENTS } from './assessments.data';
+import { ROLES } from './roles.data';
 
 /** Deterministic PRNG so every seed run produces the same demo cohort. */
 function mulberry32(seed: number) {
@@ -50,49 +50,10 @@ const FIRST = ['Aarav', 'Diya', 'Vivaan', 'Ananya', 'Aditya', 'Isha', 'Arjun', '
 const LAST = ['Sharma', 'Verma', 'Gupta', 'Singh', 'Patel', 'Iyer', 'Nair', 'Reddy', 'Das', 'Mondal', 'Mehta', 'Joshi', 'Kulkarni', 'Banerjee', 'Chatterjee', 'Rao'];
 const DEPTS: Array<[string, number]> = [['CSE', 0.5], ['IT', 0.22], ['ECE', 0.18], ['MECH', 0.1]];
 
-// @Module({
-//   imports: [
-//     ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
-//     MongooseModule.forRootAsync({ inject: [ConfigService], useFactory: (c: ConfigService) => ({ uri: c.get<string>('MONGODB_URI')! }) }),
-//     DatabaseModule,
-//     RedisModule,
-//     AuditModule,
-//     SystemConfigModule,
-//     ReadinessModule,
-//   ],
-// })
-// class SeedModule {}
-
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-
-      // Load .env from the repository root:
-      // placement-readiness-platform/.env
-      envFilePath: path.resolve(
-        __dirname,
-        '../../../../.env',
-      ),
-
-      validate: validateEnv,
-    }),
-
-    MongooseModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const uri = configService.get<string>('MONGODB_URI');
-
-        if (!uri) {
-          throw new Error(
-            'MONGODB_URI is missing from the root .env file',
-          );
-        }
-
-        return { uri };
-      },
-    }),
-
+    ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
+    MongooseModule.forRootAsync({ inject: [ConfigService], useFactory: (c: ConfigService) => ({ uri: c.get<string>('MONGODB_URI')! }) }),
     DatabaseModule,
     RedisModule,
     AuditModule,
@@ -101,9 +62,6 @@ const DEPTS: Array<[string, number]> = [['CSE', 0.5], ['IT', 0.22], ['ECE', 0.18
   ],
 })
 class SeedModule {}
-
-
-
 
 async function main() {
   const reset = process.argv.includes('--reset');
@@ -118,7 +76,7 @@ async function main() {
     evidence: get<any>('EvidenceItem'), verifications: get<any>('Verification'), assessments: get<any>('Assessment'), attempts: get<any>('AssessmentAttempt'),
     interviews: get<any>('MockInterview'), drives: get<any>('PlacementDrive'), reqs: get<any>('DriveRequirement'), rules: get<any>('EligibilityRule'),
     regs: get<any>('Registration'), skillProfiles: get<any>('SkillProfile'), snapshots: get<any>('ReadinessSnapshot'), plans: get<any>('PreparationPlan'),
-    tasks: get<any>('PreparationTask'), grants: get<any>('RecruiterAccessGrant'), batches: get<any>('BatchJob'), access: get<any>('AccessLog'), audit: get<any>('AuditLog'), gaps: get<any>('GapAnalysis'),
+    tasks: get<any>('PreparationTask'), roles: get<any>('RoleProfile'), grants: get<any>('RecruiterAccessGrant'), batches: get<any>('BatchJob'), access: get<any>('AccessLog'), audit: get<any>('AuditLog'), gaps: get<any>('GapAnalysis'),
   };
   const readiness = app.get(ReadinessService);
   const sysConfig = app.get(SystemConfigService);
@@ -153,6 +111,24 @@ async function main() {
     if (!id) throw new Error(`Unknown skill in seed data: ${name}`);
     return id;
   };
+
+  // ------------------------------------------------------------------ target job roles (idempotent upserts)
+  const roleId = new Map<string, Types.ObjectId>();
+  for (const r of ROLES) {
+    const requirements = r.requirements.map(([name, kind, level, weight, mandatory]) => ({
+      kind,
+      skill: kind === 'skill' ? sid(name) : undefined,
+      cluster: kind === 'cluster' ? (clusterId.get(name) ?? (() => { throw new Error(`Unknown cluster in role seed: ${name}`); })()) : undefined,
+      requiredLevel: level,
+      weight,
+      mandatory: !!mandatory,
+    }));
+    await m.roles.updateOne({ slug: r.slug }, { $set: { title: r.title, family: r.family, summary: r.summary, active: true, requirements }, $setOnInsert: { slug: r.slug } }, { upsert: true });
+    const saved: any = await m.roles.findOne({ slug: r.slug }).lean();
+    roleId.set(r.slug, saved._id);
+  }
+  console.log(`Roles: ${ROLES.length} target job roles`);
+  const roleIds = ROLES.map((r) => roleId.get(r.slug)!);
 
   // ------------------------------------------------------------------ staff, recruiters
   const passwordHash = await argon2.hash(DEMO_PASSWORD, { type: argon2.argon2id });
@@ -299,6 +275,7 @@ async function main() {
       cgpa,
       tenthPercent: Math.round(clamp(62 + strength * 33 + rnd() * 4, 55, 99) * 10) / 10,
       twelfthPercent: Math.round(clamp(60 + strength * 33 + rnd() * 4, 55, 99) * 10) / 10,
+      targetRole: i === 1 ? roleId.get('full-stack-web-developer') : roleIds[i % roleIds.length],
       activeBacklogs: rnd() < 0.1 ? 1 + Math.floor(rnd() * 2) : 0,
       historyOfBacklogs: rnd() < 0.12,
       phone: `+91-98${String(10000000 + Math.floor(rnd() * 89999999))}`,

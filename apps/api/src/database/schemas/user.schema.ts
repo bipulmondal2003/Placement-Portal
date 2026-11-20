@@ -93,6 +93,10 @@ export class StudentProfile {
   @Prop({ type: SchemaTypes.ObjectId, ref: 'User', index: true })
   mentor?: Types.ObjectId;
 
+  /** Job role the student is currently preparing for (see RoleProfile). */
+  @Prop({ type: SchemaTypes.ObjectId, ref: 'RoleProfile' })
+  targetRole?: Types.ObjectId;
+
   @Prop({ type: [ProjectEntrySchema], default: [] })
   projects: ProjectEntry[];
 

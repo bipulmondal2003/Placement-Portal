@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: { default: 'Placement Skill Matcher', template: '%s · Placement Skill Matcher' },
   description: 'Evidence-based placement readiness and skill-gap analysis for campus placements.',
 };
-export const viewport: Viewport = { themeColor: [{ media: '(prefers-color-scheme: dark)', color: '#0b1220' }, { media: '(prefers-color-scheme: light)', color: '#f5f7fb' }] };
+export const viewport: Viewport = { themeColor: [{ media: '(prefers-color-scheme: dark)', color: '#0a0f1f' }, { media: '(prefers-color-scheme: light)', color: '#f1f4fa' }] };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

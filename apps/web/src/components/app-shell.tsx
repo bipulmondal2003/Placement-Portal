@@ -2,8 +2,9 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
-import { LogOut, Menu, ScanSearch, X } from 'lucide-react';
+import { LogOut, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { LogoMark } from '@/components/logo';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LoadingBlock } from '@/components/states';
 import { HOME, useAuth, type Role } from '@/lib/auth';
@@ -13,8 +14,8 @@ import { cn } from '@/lib/utils';
 export function Brand({ href = '/' }: { href?: string }) {
   return (
     <Link href={href} className="flex items-center gap-2 font-semibold">
-      <span className="grid size-8 place-items-center rounded-md bg-primary text-primary-foreground"><ScanSearch className="size-4" aria-hidden /></span>
-      <span className="leading-tight">Placement<br /><span className="text-xs font-normal text-muted-foreground">Skill Matcher</span></span>
+      <LogoMark className="size-9 shrink-0" />
+      <span className="leading-tight">Placement Skill Matcher<br /><span className="text-xs font-normal text-muted-foreground">Readiness Analyser</span></span>
     </Link>
   );
 }
@@ -59,7 +60,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         const exact = items.every((o) => o === it || !o.href.startsWith(it.href + '/') || !pathname.startsWith(o.href));
         const isActive = active && exact;
         return (
-          <Link key={it.href} href={it.href} aria-current={isActive ? 'page' : undefined} className={cn('flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors [&_svg]:size-4', isActive ? 'bg-accent font-medium text-accent-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground')}>
+          <Link key={it.href} href={it.href} aria-current={isActive ? 'page' : undefined} className={cn('flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors [&_svg]:size-4', isActive ? 'bg-accent font-medium text-accent-foreground shadow-[inset_3px_0_0_hsl(var(--brand))]' : 'text-muted-foreground hover:bg-muted hover:text-foreground')}>
             <it.icon aria-hidden />{it.label}
           </Link>
         );
@@ -69,7 +70,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[250px_1fr]">
-      <aside className="sticky top-0 hidden h-screen flex-col gap-6 border-r bg-card p-4 lg:flex">
+      <aside className="sticky top-3 hidden flex-col gap-6 glass-strong m-3 mr-0 rounded-xl p-4 lg:flex lg:h-[calc(100vh-1.5rem)]">
         <Brand href={HOME[user.role]} />
         {Nav}
         <div className="mt-auto space-y-3 border-t pt-4">
@@ -85,7 +86,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="min-w-0">
-        <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-background/90 px-4 py-2.5 backdrop-blur lg:hidden">
+        <header className="sticky top-0 z-30 flex items-center justify-between glass-strong px-4 py-2.5 lg:hidden">
           <Brand href={HOME[user.role]} />
           <div className="flex items-center gap-1">
             <ThemeToggle />
@@ -93,7 +94,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </header>
         {open && (
-          <div className="border-b bg-card p-3 lg:hidden">
+          <div className="glass-strong border-t-0 p-3 lg:hidden">
             {Nav}
             <Button variant="outline" size="sm" className="mt-3 w-full" onClick={async () => { await logout(); router.replace('/login'); }}><LogOut />Sign out</Button>
           </div>

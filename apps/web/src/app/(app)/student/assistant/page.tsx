@@ -46,7 +46,7 @@ function Chat() {
         <div className="h-[380px] space-y-3 overflow-y-auto rounded-md border bg-muted/30 p-3" role="log" aria-live="polite" aria-label="Conversation">
           {turns.length === 0 && <p className="text-sm text-muted-foreground">Try: “What should I study first for this drive?” or “How do I show my React skills as evidence?”</p>}
           {turns.map((t, i) => (
-            <div key={i} className={cn('max-w-[85%] whitespace-pre-line rounded-lg px-3 py-2 text-sm', t.role === 'user' ? 'ml-auto bg-primary text-primary-foreground' : 'bg-card border')}>{t.role === 'assistant' && <AiLabel className="mb-1" />}<p>{t.text}</p></div>
+            <div key={i} className={cn('max-w-[85%] whitespace-pre-line rounded-lg px-3 py-2 text-sm', t.role === 'user' ? 'ml-auto bg-primary text-primary-foreground' : 'glass')}>{t.role === 'assistant' && <AiLabel className="mb-1" />}<p>{t.text}</p></div>
           ))}
           {busy && <p className="text-sm text-muted-foreground">Thinking…</p>}
           <div ref={end} />

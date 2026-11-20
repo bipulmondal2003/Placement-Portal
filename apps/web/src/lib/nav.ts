@@ -1,4 +1,4 @@
-import { BarChart3, BookOpenCheck, BriefcaseBusiness, CalendarCheck2, ClipboardCheck, FileCheck2, GaugeCircle, GraduationCap, KeyRound, LayoutDashboard, ListChecks, MessagesSquare, Radar, Settings2, ShieldCheck, Sparkles, Target, Users, Workflow, type LucideIcon } from 'lucide-react';
+import { BarChart3, BookOpenCheck, BriefcaseBusiness, CalendarCheck2, ClipboardCheck, FileCheck2, GaugeCircle, GraduationCap, KeyRound, LayoutDashboard, ListChecks, MessagesSquare, Mic, Briefcase, Radar, Settings2, ShieldCheck, Sparkles, Target, Users, Workflow, type LucideIcon } from 'lucide-react';
 import type { Role } from './auth';
 
 export interface NavItem {
@@ -21,9 +21,11 @@ export const NAV: Record<Exclude<Role, 'recruiter'>, NavItem[]> = {
     { href: '/student', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/student/drives', label: 'Drives', icon: Target },
     { href: '/student/skills', label: 'My skills', icon: Radar },
+    { href: '/student/roles', label: 'Target roles', icon: Briefcase },
     { href: '/student/evidence', label: 'Evidence', icon: FileCheck2 },
     { href: '/student/assessments', label: 'Assessments', icon: BookOpenCheck },
     { href: '/student/plan', label: 'Preparation plan', icon: CalendarCheck2 },
+    { href: '/student/interview', label: 'Mock interview', icon: Mic },
     { href: '/student/assistant', label: 'AI assistant', icon: Sparkles },
     { href: '/student/profile', label: 'Profile', icon: GraduationCap },
   ],

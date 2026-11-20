@@ -41,7 +41,27 @@ async function request<T>(method: Method, url: string, body?: unknown): Promise<
   return data as T;
 }
 
+/** Multipart upload (browser sets the boundary header itself, so no Content-Type here). */
+async function upload<T>(url: string, field: string, file: File): Promise<T> {
+  const form = new FormData();
+  form.append(field, file);
+  const res = await fetch(`/api${url}`, { method: 'POST', credentials: 'include', body: form, cache: 'no-store' });
+  const text = await res.text();
+  let data: any = undefined;
+  try {
+    data = text ? JSON.parse(text) : undefined;
+  } catch {
+    data = { message: res.status === 413 ? 'The file is too large for the server.' : text };
+  }
+  if (!res.ok) {
+    const m = data?.message;
+    throw new ApiError(res.status, Array.isArray(m) ? m.join('. ') : (m ?? res.statusText), data);
+  }
+  return data as T;
+}
+
 export const api = {
+  upload,
   get: <T>(url: string) => request<T>('GET', url),
   post: <T>(url: string, body?: unknown) => request<T>('POST', url, body ?? {}),
   put: <T>(url: string, body?: unknown) => request<T>('PUT', url, body ?? {}),

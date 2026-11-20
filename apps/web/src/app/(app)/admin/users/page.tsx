@@ -56,7 +56,7 @@ export default function AdminUsers() {
       </div>
       {err && <p role="alert" className="mb-3 rounded-md border border-gap/30 bg-gap-soft p-3 text-sm">{err}</p>}
       <Query q={q} rows={5}>{(d) => d.items.length === 0 ? <EmptyState title="No users match" /> : (
-        <><div className="overflow-x-auto rounded-lg border bg-card"><Table><THead><TR><TH>Name</TH><TH>Email</TH><TH>Role</TH><TH>Dept / company</TH><TH>Status</TH><TH><span className="sr-only">Actions</span></TH></TR></THead><TBody>{d.items.map((u) => {
+        <><div className="overflow-x-auto glass rounded-xl"><Table><THead><TR><TH>Name</TH><TH>Email</TH><TH>Role</TH><TH>Dept / company</TH><TH>Status</TH><TH><span className="sr-only">Actions</span></TH></TR></THead><TBody>{d.items.map((u) => {
           const self = u._id === me?.id;
           return (
             <TR key={u._id}><TD className="font-medium">{u.name}</TD><TD className="text-xs">{u.email}</TD>
